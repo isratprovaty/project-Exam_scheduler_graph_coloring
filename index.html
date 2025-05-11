@@ -1,0 +1,81 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h1 class="card-title">Exam Scheduler using Graph Coloring</h1>
+            </div>
+            <div class="card-body">
+                <p class="lead">
+                    This application schedules exams to avoid conflicts using a graph coloring algorithm. 
+                    It ensures that no student has to take two exams at the same time.
+                </p>
+                
+                <h5>How it works:</h5>
+                <ol>
+                    <li>Each subject is represented as a node in a graph</li>
+                    <li>An edge is created between subjects that share at least one common student</li>
+                    <li>The graph coloring algorithm assigns a color (time slot) to each subject</li>
+                    <li>Subjects with the same color can be scheduled in the same time slot</li>
+                </ol>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header bg-secondary text-white">
+                <h2 class="card-title">Input Data</h2>
+            </div>
+            <div class="card-body">
+                <form id="scheduler-form" action="{{ url_for('schedule') }}" method="post">
+                    <div class="mb-3">
+                        <label for="subjects" class="form-label">Subjects (comma-separated):</label>
+                        <input type="text" class="form-control" id="subjects" name="subjects" 
+                               placeholder="Math, Physics, Chemistry, Biology, English" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="students" class="form-label">Students and their subjects:</label>
+                        <small class="text-muted d-block mb-2">
+                            Format: Student Name: Subject1, Subject2, Subject3
+                            <br>One student per line
+                        </small>
+                        <textarea class="form-control" id="students" name="students" rows="8" required
+                                  placeholder="Alice: Math, Physics, English
+Bob: Math, Chemistry
+Charlie: Physics, Biology
+Daisy: Math, English, Biology
+Eve: Chemistry, Biology"></textarea>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <button type="button" class="btn btn-secondary me-md-2" id="load-example">Load Example Data</button>
+                        <button type="submit" class="btn btn-primary">Generate Schedule</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Store example data
+    const exampleSubjects = {{ example_subjects|safe }};
+    const exampleStudents = {{ example_students|safe }};
+    
+    document.getElementById('load-example').addEventListener('click', function() {
+        // Load example subjects
+        document.getElementById('subjects').value = exampleSubjects.join(', ');
+        
+        // Load example students
+        let studentsText = '';
+        for (const [student, subjects] of Object.entries(exampleStudents)) {
+            studentsText += `${student}: ${subjects.join(', ')}\n`;
+        }
+        document.getElementById('students').value = studentsText.trim();
+    });
+</script>
+{% endblock %}
